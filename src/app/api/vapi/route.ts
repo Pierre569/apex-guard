@@ -85,255 +85,261 @@ export async function POST(req: Request) {
             return NextResponse.json({
                 assistantOverrides: {
                     name: "Apex Guard - Alex (Master Orchestrator)",
-                    // ... (Greeting)
                     firstMessage: `Hello! This is Alex with Apex Guard. How can I help you today?`,
-                    // ...
-
-                    // ... (Tool Definition: Check Availability)
-                    name: "checkAvailability",
-                    description: "Checks real-time availability in the GoHighLevel calendar.",
-                    parameters: {
-                        type: "object",
-                        properties: {
-                            date: { type: "string", description: "YYYY-MM-DD" },
-                            timezone: { type: "string", description: "America/New_York if not specified" }
-                        },
-                        required: ["date"]
-                    }
+                    model: {
+                        provider: "google",
+                        model: "gemini-1.5-flash",
+                        temperature: 0.1,
+                        messages: [
                             {
-                    type: "function",
-                    function: {
-                        name: "bookAppointment",
-                        description: "Books the appointment.",
-                        parameters: {
-                            type: "object",
-                            properties: {
-                                name: { type: "string" },
-                                service: { type: "string" },
-                                datetime: { type: "string" }
+                                role: "system",
+                                content: MASTER_SYSTEM_PROMPT
                             }
-                        }
-                    }
-                },
-                {
-                    type: "function",
-                    function: {
-                        name: "saveCallState",
-                        description: "Saves critical lead info mid-call to prevent data loss.",
-                        parameters: {
-                            type: "object",
-                            properties: {
-                                name: { type: "string" },
-                                pest: { type: "string" },
-                                address: { type: "string" },
-                                intent: { type: "string", enum: ["new_lead", "reschedule", "billing", "complaint"] }
-                            },
-                            required: ["intent"]
-                        }
-                    }
-                },
-                {
-                    type: "function",
-                    function: {
-                        name: "validateAddress",
-                        description: "Validates if a service address is real/servable.",
-                        parameters: {
-                            type: "object",
-                            properties: {
-                                address: { type: "string" }
-                            },
-                            required: ["address"]
-                        }
-                    }
-                },
-                {
-                    type: "transfer", // Advanced Tool Type
-                    name: "transfer_to_owner",
-                    description: "Transfers the call to the business owner.",
-                    dest: {
-                        type: "number",
-                        number: "+19103879259", // Owner Number
-                        extension: ""
-                    },
-                    // Note: Vapi 'transfer' tool configuration in JSON usually adds specific fields like 'phoneNumber'. 
-                    // Adapting to standard Vapi JSON structure for transfer tools.
-                    // If Vapi overrides strictly require 'function' type for some models, 
-                    // we might default to 'function' and handle it, but 'transfer' type is supported in Vapi 2.0.
-                    // Using the user's JSON structure:
-                    phoneNumber: "+19103879259",
-                    message: "One moment while I try to connect you with the owner...",
-                    holdMusicUrl: "https://apex-guard-beta.vercel.app/hold-music.mp3",
-                    async: false
-                },
-                {
-                    type: "function",
-                    function: {
-                        name: "handleVapiToGHL",
-                        description: "Syncs the customer info and summarized message to GoHighLevel CRM when the owner is unavailable.",
-                        parameters: {
-                            type: "object",
-                            properties: {
-                                summary: {
-                                    type: "string",
-                                    description: "The 1-sentence English summary of the user's message."
-                                },
-                                customer_name: {
-                                    type: "string",
-                                    description: "The name of the caller."
-                                },
-                                customer_phone: {
-                                    type: "string",
-                                    description: "The phone number of the caller."
-                                },
-                                pest_type: {
-                                    type: "string",
-                                    description: "The type of pest discussed during the call."
+                        ],
+                        tools: [
+                            {
+                                type: "function",
+                                function: {
+                                    name: "checkAvailability",
+                                    description: "Checks real-time availability in the GoHighLevel calendar.",
+                                    parameters: {
+                                        type: "object",
+                                        properties: {
+                                            date: { type: "string", description: "YYYY-MM-DD" },
+                                            timezone: { type: "string", description: "America/New_York if not specified" }
+                                        },
+                                        required: ["date"]
+                                    }
                                 }
                             },
-                            required: ["summary", "customer_phone"]
-                        }
-                    }
-                }
+                            {
+                                type: "function",
+                                function: {
+                                    name: "bookAppointment",
+                                    description: "Books the appointment.",
+                                    parameters: {
+                                        type: "object",
+                                        properties: {
+                                            name: { type: "string" },
+                                            service: { type: "string" },
+                                            datetime: { type: "string" }
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                type: "function",
+                                function: {
+                                    name: "saveCallState",
+                                    description: "Saves critical lead info mid-call to prevent data loss.",
+                                    parameters: {
+                                        type: "object",
+                                        properties: {
+                                            name: { type: "string" },
+                                            pest: { type: "string" },
+                                            address: { type: "string" },
+                                            intent: { type: "string", enum: ["new_lead", "reschedule", "billing", "complaint"] }
+                                        },
+                                        required: ["intent"]
+                                    }
+                                }
+                            },
+                            {
+                                type: "function",
+                                function: {
+                                    name: "validateAddress",
+                                    description: "Validates if a service address is real/servable.",
+                                    parameters: {
+                                        type: "object",
+                                        properties: {
+                                            address: { type: "string" }
+                                        },
+                                        required: ["address"]
+                                    }
+                                }
+                            },
+                            {
+                                type: "transfer",
+                                name: "transfer_to_owner",
+                                description: "Transfers the call to the business owner.",
+                                dest: {
+                                    type: "number",
+                                    number: "+19103879259",
+                                    extension: ""
+                                },
+                                phoneNumber: "+19103879259",
+                                message: "One moment while I try to connect you with the owner...",
+                                holdMusicUrl: "https://apex-guard-beta.vercel.app/hold-music.mp3",
+                                async: false
+                            },
+                            {
+                                type: "function",
+                                function: {
+                                    name: "handleVapiToGHL",
+                                    description: "Syncs the customer info and summarized message to GoHighLevel CRM when the owner is unavailable.",
+                                    parameters: {
+                                        type: "object",
+                                        properties: {
+                                            summary: {
+                                                type: "string",
+                                                description: "The 1-sentence English summary of the user's message."
+                                            },
+                                            customer_name: {
+                                                type: "string",
+                                                description: "The name of the caller."
+                                            },
+                                            customer_phone: {
+                                                type: "string",
+                                                description: "The phone number of the caller."
+                                            },
+                                            pest_type: {
+                                                type: "string",
+                                                description: "The type of pest discussed during the call."
+                                            }
+                                        },
+                                        required: ["summary", "customer_phone"]
+                                    }
+                                }
+                            }
                         ]
                     },
-        silenceTimeoutSeconds: 45,
-            voice: {
-            provider: "cartesia",
-                voiceId: "79a125e8-cd45-4c13-8a67-188112f4dd22",
+                    silenceTimeoutSeconds: 45,
+                    voice: {
+                        provider: "cartesia",
+                        voiceId: "79a125e8-cd45-4c13-8a67-188112f4dd22",
                     },
-    }
+                }
             });
         }
 
-// Helper to simulate sending SMS
-async function sendSMS(to: string, body: string) {
-    console.log(`📱 SENDING SMS to ${to}: "${body}"`);
-    await addDoc(collection(db, 'outbound_messages'), {
-        to,
-        body,
-        status: 'sent',
-        createdAt: serverTimestamp()
-    });
-}
-
-// 2. End of Call Report
-if (message.type === 'end-of-call-report') {
-    const report = message;
-    console.log('📝 Saving Call Report...');
-
-    const summary = report.analysis?.summary || 'No summary provided';
-    const customerPhone = report.customer?.number || 'Unknown';
-    const appointmentSet = report.analysis?.structuredData?.appointment_booked || false;
-
-    // Save Lead
-    await addDoc(collection(db, 'leads'), {
-        source: 'vapi_phone',
-        summary,
-        transcript: report.transcript || '',
-        recordingUrl: report.recordingUrl || '',
-        customerPhone,
-        status: appointmentSet ? 'booked' : 'new',
-        createdAt: serverTimestamp()
-    });
-
-    // POST-CALL AUTOMATION (The "Amazoning")
-    if (customerPhone && customerPhone !== 'Unknown') {
-        let smsBody = "";
-        if (appointmentSet) {
-            smsBody = `Hi! It's Alex from Apex Guard. Your inspection is confirmed! Here is your prep checklist: https://apex-guard-beta.vercel.app/prep`;
-        } else {
-            smsBody = `Thanks for chatting! If you find that bug again, snap a photo here: https://apex-guard-beta.vercel.app`;
+        // Helper to simulate sending SMS
+        async function sendSMS(to: string, body: string) {
+            console.log(`📱 SENDING SMS to ${to}: "${body}"`);
+            await addDoc(collection(db, 'outbound_messages'), {
+                to,
+                body,
+                status: 'sent',
+                createdAt: serverTimestamp()
+            });
         }
-        await sendSMS(customerPhone, smsBody);
-    }
 
-    return NextResponse.json({ success: true, id: report.call?.id });
-}
+        // 2. End of Call Report
+        if (message.type === 'end-of-call-report') {
+            const report = message;
+            console.log('📝 Saving Call Report...');
 
-// 3. Tool Calls (Booking Automation)
-if (message.type === 'tool-calls') {
-    const toolCalls = message.toolCalls || [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const results: any[] = [];
+            const summary = report.analysis?.summary || 'No summary provided';
+            const customerPhone = report.customer?.number || 'Unknown';
+            const appointmentSet = report.analysis?.structuredData?.appointment_booked || false;
 
-    for (const call of toolCalls) {
-        // Determine if it's a function tool or other type
-        if (call.type === 'function') {
-            const { name, arguments: argsUnknown } = call.function;
+            // Save Lead
+            await addDoc(collection(db, 'leads'), {
+                source: 'vapi_phone',
+                summary,
+                transcript: report.transcript || '',
+                recordingUrl: report.recordingUrl || '',
+                customerPhone,
+                status: appointmentSet ? 'booked' : 'new',
+                createdAt: serverTimestamp()
+            });
+
+            // POST-CALL AUTOMATION (The "Amazoning")
+            if (customerPhone && customerPhone !== 'Unknown') {
+                let smsBody = "";
+                if (appointmentSet) {
+                    smsBody = `Hi! It's Alex from Apex Guard. Your inspection is confirmed! Here is your prep checklist: https://apex-guard-beta.vercel.app/prep`;
+                } else {
+                    smsBody = `Thanks for chatting! If you find that bug again, snap a photo here: https://apex-guard-beta.vercel.app`;
+                }
+                await sendSMS(customerPhone, smsBody);
+            }
+
+            return NextResponse.json({ success: true, id: report.call?.id });
+        }
+
+        // 3. Tool Calls (Booking Automation)
+        if (message.type === 'tool-calls') {
+            const toolCalls = message.toolCalls || [];
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const args = argsUnknown as Record<string, any>;
-            console.log(`🛠️ Tool Call: ${name}`, args);
+            const results: any[] = [];
 
-            if (name === 'checkAvailability') {
-                const slots = await getGHLAvailability(args.date);
-                results.push({
-                    toolCallId: call.id,
-                    result: slots
-                });
-            }
+            for (const call of toolCalls) {
+                // Determine if it's a function tool or other type
+                if (call.type === 'function') {
+                    const { name, arguments: argsUnknown } = call.function;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const args = argsUnknown as Record<string, any>;
+                    console.log(`🛠️ Tool Call: ${name}`, args);
 
-            if (name === 'bookAppointment') {
-                await addDoc(collection(db, 'appointments'), {
-                    ...args,
-                    status: 'booked',
-                    createdAt: serverTimestamp()
-                });
-                results.push({
-                    toolCallId: call.id,
-                    result: "Perfect. I have you confirmed for that time. You'll receive a confirmation text shortly."
-                });
-            }
+                    if (name === 'checkAvailability') {
+                        const slots = await getGHLAvailability(args.date);
+                        results.push({
+                            toolCallId: call.id,
+                            result: slots
+                        });
+                    }
 
-            if (name === 'transfer_to_owner') {
-                // In case Vapi executes this as a function despite 'transfer' type config (fallback)
-                results.push({
-                    toolCallId: call.id,
-                    result: "Transferring..."
-                });
-            }
+                    if (name === 'bookAppointment') {
+                        await addDoc(collection(db, 'appointments'), {
+                            ...args,
+                            status: 'booked',
+                            createdAt: serverTimestamp()
+                        });
+                        results.push({
+                            toolCallId: call.id,
+                            result: "Perfect. I have you confirmed for that time. You'll receive a confirmation text shortly."
+                        });
+                    }
 
-            if (name === 'handleVapiToGHL') {
-                const result = await handleVapiToGHL({
-                    summary: args.summary,
-                    customer_name: args.customer_name,
-                    customer_phone: args.customer_phone,
-                    pest_type: args.pest_type
-                });
-                results.push({
-                    toolCallId: call.id,
-                    result: result.status === 'success' ? "Message synced to Owner." : "Error syncing message."
-                });
-            }
+                    if (name === 'transfer_to_owner') {
+                        results.push({
+                            toolCallId: call.id,
+                            result: "Transferring..."
+                        });
+                    }
 
-            if (name === 'saveCallState') {
-                await addDoc(collection(db, 'active_calls'), {
-                    ...args,
-                    updatedAt: serverTimestamp()
-                });
-                results.push({
-                    toolCallId: call.id,
-                    result: "Info saved."
-                });
-            }
+                    if (name === 'handleVapiToGHL') {
+                        const result = await handleVapiToGHL({
+                            summary: args.summary,
+                            customer_name: args.customer_name,
+                            customer_phone: args.customer_phone,
+                            pest_type: args.pest_type
+                        });
+                        results.push({
+                            toolCallId: call.id,
+                            result: result.status === 'success' ? "Message synced to Owner." : "Error syncing message."
+                        });
+                    }
 
-            if (name === 'validateAddress') {
-                const isValid = args.address && args.address.length > 5;
-                results.push({
-                    toolCallId: call.id,
-                    result: isValid ? "Address verified." : "Address not found, please ask again."
-                });
+                    if (name === 'saveCallState') {
+                        await addDoc(collection(db, 'active_calls'), {
+                            ...args,
+                            updatedAt: serverTimestamp()
+                        });
+                        results.push({
+                            toolCallId: call.id,
+                            result: "Info saved."
+                        });
+                    }
+
+                    if (name === 'validateAddress') {
+                        const isValid = args.address && args.address.length > 5;
+                        results.push({
+                            toolCallId: call.id,
+                            result: isValid ? "Address verified." : "Address not found, please ask again."
+                        });
+                    }
+                }
             }
+            return NextResponse.json({ results });
         }
-    }
-    return NextResponse.json({ results });
-}
 
-return NextResponse.json({ success: true }, { status: 200 });
+        return NextResponse.json({ success: true }, { status: 200 });
 
     } catch (error) {
-    console.error('❌ Vapi Webhook Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-}
+        console.error('❌ Vapi Webhook Error:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
 }
 
 export async function GET() {
