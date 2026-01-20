@@ -14,7 +14,18 @@ Globs: **/*.{js,jsx,ts,tsx,md,html}
 ## Technical Requirements
 
 - Use WebP/AVIF for all images.
-- Every new URL created must trigger a `pingGoogleIndexingAPI` call in the deployment pipeline.
+- Every new# PROJ: Apex Guard
+# NICHE: Pest Control
+# LOC: Wilmington, NC
+# ---
+# CONTENT ENGINE MASTER RULES
+# 1. AUTONOMOUS WRITER: Use Gemini 1.5 Pro (or High-Fidelity Simulator) to generate articles in /content/pending.
+# 2. SEO MANDATE: Min 1,000 words. H1/H2/H3 tags. 2+ internal links, 1 link to Bug/Leak ID tool.
+# 3. NICHE GUARDRAIL: Cross-ref 'SiteManifest.niche'. Rewrite if drift detected.
+# 4. SCHEDULING: Add 'publishDate'. Schedule for Tue/Thu 9:00 AM.
+# 5. VALIDATION: Run 'node scripts/validate-content.js' before deploy. Abort on fail.
+# ---
+ogleIndexingAPI` call in the deployment pipeline.
 - Accessibility: Text-to-background contrast must always exceed 4.5:1 (WCAG AA).
 
 # GLOBAL SEO & PERFORMANCE RULES

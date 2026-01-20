@@ -1,0 +1,29 @@
+name: Autonomous Multi-Host Deploy
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Runs every 6 hours
+  push:
+    branches: [main, master]
+
+jobs:
+  validate_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Run AI Editor Validation
+        run: node scripts/validate-content.js
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
