@@ -1,0 +1,18 @@
+{
+    "businessName": "Flow Guard Plumbing",
+    "niche": "Plumbing",
+    "phone": "(910) 555 0199",
+    "email": "help@flowguard.com",
+    "address": "Raleigh, NC",
+    "primaryColor": "#0ea5e9",
+    "features": {
+        "useImageID": true,
+        "communityAlerts": false,
+        "techDistance": true
+    },
+    "aiName": "Sarah",
+    "meta": {
+        "schemaType": "PlumbingService",
+        "defaultDescription": "24/7 Emergency plumbing and leak detection."
+    }
+}

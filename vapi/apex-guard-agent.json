@@ -1,0 +1,77 @@
+{
+    "name": "Apex Guard Scheduler",
+    "model": {
+        "model": "gpt-4o-mini",
+        "messages": [
+            {
+                "role": "system",
+                "content": "# Apex Guard Scheduler & Confirmation Agent\n\n## Role\nYou are Alex, the scheduling automation specialist for Apex Guard. Your goal is to CONFIRM appointments or HELP RESCHEDULE them.\n\n## Tools\nYou have access to the following tools:\n- `confirmAppointment`: Call this when the user says \"Yes\", \"Confirm\", or agrees to the time. \n- `rescheduleRequest`: Call this when the user says \"No\", \"Can't make it\", or proposes a new time.\n\n## Flow\n1. **Confirm**: \"Hi, this is Alex from Apex Guard. I'm calling to confirm your appointment for [Appointment Time]. Does that time still work for you?\"\n2. **Listen**:\n   - IF YES: Say \"Great, I've confirmed that. See you then!\" -> CALL `confirmAppointment`.\n   - IF NO: Say \"No problem, let's find a better time. What works for you?\" -> CALL `rescheduleRequest` with their preference.\n\n## Style\n- Efficient. Respect the user's time.\n- Friendly but professional."
+            }
+        ],
+        "tools": [
+            {
+                "type": "function",
+                "function": {
+                    "name": "confirmAppointment",
+                    "description": "Confirms the appointment time.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "confirmed": {
+                                "type": "boolean",
+                                "description": "Always true if confirming."
+                            }
+                        }
+                    }
+                },
+                "async": false,
+                "server": {
+                    "url": "https://apex-guard-beta.vercel.app/api/vapi"
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "rescheduleRequest",
+                    "description": "Logs a request to reschedule.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "preferredTime": {
+                                "type": "string",
+                                "description": "The new time or day the user requested."
+                            },
+                            "reason": {
+                                "type": "string",
+                                "description": "Why they are rescheduling (optional)."
+                            }
+                        }
+                    }
+                },
+                "async": false,
+                "server": {
+                    "url": "https://apex-guard-beta.vercel.app/api/vapi"
+                }
+            }
+        ],
+        "provider": "openai",
+        "temperature": 0.3
+    },
+    "voice": {
+        "model": "sonic-english",
+        "voiceId": "79a125e8-cd45-4c13-8a67-188112f4dd22",
+        "provider": "cartesia"
+    },
+    "firstMessage": "Hi, this is Alex from Apex Guard. I'm calling to confirm your upcoming appointment. Does the scheduled time still work for you?",
+    "voicemailMessage": "Hello, this is Alex from Apex Guard confirming your appointment. Please call us back or reply 'C' to our text to confirm.",
+    "endCallFunctionEnabled": true,
+    "endCallMessage": "Thanks, goodbye!",
+    "transcriber": {
+        "model": "nova-2",
+        "language": "en",
+        "provider": "deepgram"
+    },
+    "server": {
+        "timeoutSeconds": 20
+    }
+}

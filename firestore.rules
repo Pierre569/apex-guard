@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Allow public write access to 'leads' (for the Booking Form and Vapi)
+    match /leads/{leadId} {
+      allow create: if true;
+      allow read: if request.auth != null; // Only logged-in users (Admins) can read
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

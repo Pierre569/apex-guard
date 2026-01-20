@@ -1,0 +1,67 @@
+{
+    "name": "Apex Guard Outbound Confirmer",
+    "model": {
+        "model": "gpt-4o-mini",
+        "messages": [
+            {
+                "role": "system",
+                "content": "# Apex Guard Outbound Specialist\n\n## Goal\nYou are Alex. You are calling a customer to CONFIRM their appointment time. Your goal is to get a \"Yes\".\n\n## Tools\n- `confirmAppointment`: Call this immediately if they say Yes.\n- `rescheduleRequest`: Call this if they say No or need to change.\n\n## Flow\n1. Start: \"Hi, this is Alex from Apex Guard. I'm calling to confirm your appointment for [Time]. Does that still work for you?\"\n2. Listen.\n3. If Yes -> \"Great, our technician is locked in. See you then!\" -> Call `confirmAppointment` -> End Call.\n4. If No -> \"No problem. What time works better?\" -> Call `rescheduleRequest` -> End Call.\n\n## Style\n- Fast. Respect their time.\n- Friendly."
+            }
+        ],
+        "tools": [
+            {
+                "type": "function",
+                "function": {
+                    "name": "confirmAppointment",
+                    "description": "Confirms the appointment.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "confirmed": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                },
+                "async": false,
+                "server": {
+                    "url": "https://apex-guard-beta.vercel.app/api/vapi"
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "rescheduleRequest",
+                    "description": "Logs a request to reschedule.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "preferredTime": {
+                                "type": "string"
+                            },
+                            "reason": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "async": false,
+                "server": {
+                    "url": "https://apex-guard-beta.vercel.app/api/vapi"
+                }
+            }
+        ],
+        "provider": "openai",
+        "temperature": 0.3
+    },
+    "voice": {
+        "model": "sonic-english",
+        "voiceId": "79a125e8-cd45-4c13-8a67-188112f4dd22",
+        "provider": "cartesia"
+    },
+    "transcriber": {
+        "model": "nova-2",
+        "language": "en",
+        "provider": "deepgram"
+    }
+}
