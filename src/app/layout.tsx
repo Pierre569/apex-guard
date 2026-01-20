@@ -29,7 +29,6 @@ export const metadata: Metadata = {
   description: "AI-Powered Pest Protection for your home and family. Call (910) 387-9259 for a free inspection.",
   icons: {
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
       { url: '/logo.png', type: 'image/png' },
     ],
     shortcut: ['/logo.png'],
@@ -92,7 +91,7 @@ export default function RootLayout({
             })
           }}
         />
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/logo.png" type="image/png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
