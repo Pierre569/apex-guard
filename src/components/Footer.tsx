@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { siteConfig } from "@/config/site";
 import Image from "next/image";
 import { ShieldCheck } from "lucide-react";
 
@@ -23,8 +24,9 @@ export default function Footer() {
                         Defending North Carolina homes with military-grade precision.
                         Your perimeter is our priority.
                         <br />
-                        <a href="tel:9103879259" className="font-bold text-apex-gold hover:underline mt-2 inline-block">
-                            (910) 387 9259
+                        <br />
+                        <a href={siteConfig.phoneLink} className="font-bold text-apex-gold hover:underline mt-2 inline-block">
+                            {siteConfig.phone}
                         </a>
                     </p>
                     <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-apex-gold">

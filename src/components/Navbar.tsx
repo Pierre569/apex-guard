@@ -1,6 +1,8 @@
 "use client";
 
+
 import { useState, useEffect } from "react";
+import { siteConfig } from "@/config/site";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -72,8 +74,8 @@ export default function Navbar() {
                     {/* CTA & MOBILE TOGGLE */}
                     <div className="hidden md:flex items-center gap-6">
                         <ThemeToggle />
-                        <Link href="tel:919-555-0123" className="hidden lg:block font-medium text-neutral-300 hover:text-white transition text-xs">
-                            (910) 387 9259
+                        <Link href={siteConfig.phoneLink} className="hidden lg:block font-medium text-neutral-300 hover:text-white transition text-xs">
+                            {siteConfig.phone}
                         </Link>
                         <Link
                             href="/contact"
