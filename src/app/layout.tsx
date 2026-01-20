@@ -81,6 +81,7 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        data-build="v2.1-security-patch"
       >
         <ThemeProvider
           attribute="class"
