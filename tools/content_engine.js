@@ -8,9 +8,9 @@
  * 3. (Mock) Triggers Imagen 3 for assets.
  */
 
-require('dotenv').config({ path: '.env.local' });
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env.local') });
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const apiKey = process.env.GOOGLE_API_KEY;
@@ -20,7 +20,7 @@ if (!apiKey) {
 }
 
 const genAI = new GoogleGenerativeAI(apiKey);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 async function generateBlog(keyword, city) {
     console.log(`🚀 Content Engine Starting: Generating blog for "${keyword}" in ${city}...`);
@@ -62,7 +62,7 @@ async function generateBlog(keyword, city) {
         console.log(`   -> Saved to public/images/${slug}-hero.webp`);
 
     } catch (error) {
-        console.error("Content Generation Error:", error);
+        console.error("Content Generation Error:", error.message, error);
     }
 }
 

@@ -1,4 +1,5 @@
 "use client";
+import { siteConfig } from "@/config/site";
 
 import Image from "next/image";
 
@@ -54,11 +55,11 @@ export default function ContactPage() {
                         <div className="bg-white dark:bg-white/5 p-6 rounded-2xl shadow-sm border border-neutral-100 dark:border-white/10 max-w-md">
                             <h3 className="font-bold text-lg mb-4 text-apex-navy dark:text-white">Direct Contact</h3>
                             <div className="space-y-3">
-                                <a href="tel:9195550123" className="flex items-center gap-3 text-neutral-600 dark:text-neutral-300 hover:text-apex-gold dark:hover:text-apex-gold transition">
-                                    <Phone size={20} /> (919) 555-0123
+                                <a href={siteConfig.phoneLink} className="flex items-center gap-3 text-neutral-600 dark:text-neutral-300 hover:text-apex-gold dark:hover:text-apex-gold transition">
+                                    <Phone size={20} /> {siteConfig.phone}
                                 </a>
-                                <a href="mailto:service@apexguard.com" className="flex items-center gap-3 text-neutral-600 dark:text-neutral-300 hover:text-apex-gold dark:hover:text-apex-gold transition">
-                                    <Mail size={20} /> service@apexguard.com
+                                <a href={`mailto:${siteConfig.email}`} className="flex items-center gap-3 text-neutral-600 dark:text-neutral-300 hover:text-apex-gold dark:hover:text-apex-gold transition">
+                                    <Mail size={20} /> {siteConfig.email}
                                 </a>
                             </div>
                         </div>
