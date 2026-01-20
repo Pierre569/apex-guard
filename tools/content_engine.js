@@ -153,6 +153,14 @@ Many ${city} residents ignore the early signs, leading to costly repairs.
 *   **Sealing Entry Points**: Caulk windows and doors.
 *   **Professional Barrier**: DIY sprays often fail. Our perimeter defense stops them at the source.
 
+## 🔴 Need Help Identifying a Bug?
+Not sure if what you're seeing is a termite or an ant?
+[**Use our Free Bug ID Tool**](/prep) to upload a photo, and our AI will identify it instantly.
+
+## 📞 Speak with Alex (Our AI Specialist)
+Have questions? You don't need to wait on hold. 
+Call **(910) 387-9259** right now to speak with **Alex**, our AI Operations Manager. He can check our schedule and book your inspection in under 60 seconds.
+
 ## Conclusion
 Don't let ${topic} take over your home. Early detection is key.
 
