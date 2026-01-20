@@ -42,3 +42,36 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Universal Smoothness Layer */
+@layer base {
+  html {
+    /* Prevents the 'bouncy' scroll on iOS which can break fixed headers */
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Ensures text is readable even with screen glare outdoors */
+  body {
+    @apply antialiased text-slate-900 dark:text-slate-100;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* Prevents Layout Shift (CLS) for the Bug ID Tool */
+.image-container-placeholder {
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}

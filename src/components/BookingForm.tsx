@@ -54,6 +54,24 @@ export default function BookingForm({ onSuccess }: BookingFormProps) {
         }
     };
 
+    if (loading) {
+        return (
+            <div className="space-y-4 p-8 animate-pulse">
+                <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-1/3 mb-6"></div>
+                <div className="space-y-3">
+                    <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded-lg w-full"></div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded-lg w-full"></div>
+                        <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded-lg w-full"></div>
+                    </div>
+                    <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded-lg w-full"></div>
+                    <div className="h-32 bg-slate-200 dark:bg-slate-700 rounded-lg w-full"></div>
+                    <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded-xl w-full mt-4"></div>
+                </div>
+            </div>
+        );
+    }
+
     if (success) {
         return (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center animate-in fade-in zoom-in duration-500">

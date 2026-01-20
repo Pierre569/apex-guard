@@ -7,7 +7,8 @@ import CookieBanner from "@/components/CookieBanner";
 import SchemaMarkup from "@/components/SchemaMarkup";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import FloatingCall from "@/components/FloatingCall";
-import { siteConfig } from "@/config/site";
+import { SiteManifest } from "@/config/site-manifest";
+import TabManager from "@/components/TabManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,14 +20,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import TabManager from "@/components/TabManager";
-
 export const metadata: Metadata = {
   title: {
-    default: "Apex Guard | Professional Pest Control",
-    template: "%s | Apex Guard",
+    default: `${SiteManifest.businessName} | Professional ${SiteManifest.niche}`,
+    template: `%s | ${SiteManifest.businessName}`,
   },
-  description: "AI-Powered Pest Protection for your home and family. Call (910) 387-9259 for a free inspection.",
+  description: SiteManifest.description,
   icons: {
     icon: [
       { url: '/logo.png', type: 'image/png' },
@@ -37,7 +36,7 @@ export const metadata: Metadata = {
     ],
   },
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#2563eb' },
+    { media: '(prefers-color-scheme: light)', color: SiteManifest.meta.themeColor },
     { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
   ],
 };
@@ -55,25 +54,23 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "PestControlService",
-              "name": siteConfig.name,
-              "url": siteConfig.url,
-              "image": siteConfig.ogImage,
-              "description": siteConfig.description,
-              "telephone": siteConfig.phone,
+              "@type": SiteManifest.meta.schemaType,
+              "name": SiteManifest.businessName,
+              "url": SiteManifest.url,
+              "image": "/logo.png",
+              "description": SiteManifest.description,
+              "telephone": SiteManifest.phone,
               "priceRange": "$$",
               "address": {
                 "@type": "PostalAddress",
-                "streetAddress": siteConfig.address.street,
-                "addressLocality": siteConfig.address.city,
-                "addressRegion": siteConfig.address.state,
-                "postalCode": siteConfig.address.zip,
+                "addressLocality": SiteManifest.location.split(',')[0].trim(),
+                "addressRegion": SiteManifest.location.split(',')[1].trim(),
                 "addressCountry": "US"
               },
               "geo": {
                 "@type": "GeoCoordinates",
-                "latitude": "34.9723",
-                "longitude": "-78.9567"
+                "latitude": SiteManifest.geo.lat,
+                "longitude": SiteManifest.geo.lng
               },
               "openingHoursSpecification": [
                 {

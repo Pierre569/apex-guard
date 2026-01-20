@@ -1,0 +1,33 @@
+# Universal SEO & Authority Rules
+
+Description: Enforce high-level local SEO, automated indexing, and technical authority for any niche.
+Globs: **/*.{js,jsx,ts,tsx,md,html}
+
+## Core Directives
+
+- **Schema First:** Every service or blog page MUST have a `JSON-LD` LocalBusiness or FAQ schema generated from `SiteManifest`.
+- **Visual SEO:** All images must use the `SEOImage` component. Never use raw `<img>` or `next/image` without `alt` text generated via the Gemini Alt-Engine.
+- **Geotagging:** Ensure all niche images are processed with `utils/seo-engine.js` to inject `SiteManifest.geo` coordinates into EXIF data.
+- **Topical Authority:** When creating blog content, always include a "People Also Ask" FAQ section with at least 4 questions found in `SiteManifest.niche` research.
+- **Internal Linking:** Every niche-specific page must link to exactly 2 related "Knowledge Base" articles and 1 "Call to Action" (Phone or Quote Form).
+
+## Technical Requirements
+
+- Use WebP/AVIF for all images.
+- Every new URL created must trigger a `pingGoogleIndexingAPI` call in the deployment pipeline.
+- Accessibility: Text-to-background contrast must always exceed 4.5:1 (WCAG AA).
+
+# GLOBAL SEO & PERFORMANCE RULES
+- **Images:** All images must be WebP, < 200kb, and include Geotags for {SiteManifest.location}.
+- **Metadata:** Use Next.js Metadata API. Titles must be: "{Niche} in {Location} | {BusinessName}".
+- **Accessibility:** Text contrast must be 4.5:1. Character counters must be `text-slate-400` in Dark Mode.
+- **Mobile:** All buttons must be `min-h-[44px]` for touch targets.
+- **Indexing:** Every new page must trigger the `Google Indexing API` automatically.
+
+# Mobile & Web Smoothness Rules
+
+1. **Mobile-First Layout:** Always use `sm:`, `md:`, and `lg:` Tailwind breakpoints. Default styles MUST be for mobile (375px).
+2. **Layout Stability (CLS):** Never render images or dynamic content without defined height/width ratios. Use "Skeleton Loaders" for GHL form embeds to prevent page jumping.
+3. **Snappy Interactions (INP):** Ensure all buttons have a `touch-manipulation` class. Every click/tap must provide immediate visual feedback (hover/active states).
+4. **Font Optimization:** Use `next/font` with `display: swap` to prevent "Invisible Text" while the site is loading on slow 5G connections.
+5. **Touch Targets:** All clickable elements (buttons, links) must be at least 44x44 pixels on mobile to prevent "Fat Finger" errors.

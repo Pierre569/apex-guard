@@ -9,6 +9,8 @@ import Reviews from "@/components/Reviews";
 import BugIdentifier from "@/components/BugIdentifier";
 import NeighborhoodTicker from "@/components/NeighborhoodTicker";
 import dynamic from 'next/dynamic';
+import CostCalculator from '@/components/CostCalculator';
+import SocialProofPulse from '@/components/SocialProofPulse';
 
 const ServiceMap = dynamic(() => import('@/components/ServiceMap'), {
   ssr: false,
@@ -20,6 +22,7 @@ export default function Home() {
     <div className="min-h-screen font-sans bg-neutral-50 dark:bg-black text-apex-navy dark:text-neutral-200 transition-colors duration-300">
       {/* 2.5 NEIGHBORHOOD TICKER (Enterprise) */}
       <NeighborhoodTicker />
+      <SocialProofPulse />
 
       {/* 1. HERO */}
       <Hero />
@@ -70,11 +73,18 @@ export default function Home() {
 
       {/* 4.5 BUG IDENTIFIER (Gemini Lead Magnet) */}
       <section className="py-12 px-6 bg-blue-50 dark:bg-slate-900/50">
-        <div className="max-w-3xl mx-auto text-center mb-8">
-          <h2 className="text-3xl font-black mb-4 dark:text-white">Found a Bug? Identify it Instantly.</h2>
-          <p className="text-neutral-500 dark:text-neutral-400">Upload a photo and let our AI tell you if it's a threat.</p>
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-3xl font-black mb-4 dark:text-white">Identify the Threat.</h2>
+            <p className="text-neutral-500 dark:text-neutral-400 mb-6">Upload a photo and let our AI tell you if it&apos;s a threat.</p>
+            <BugIdentifier />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black mb-4 dark:text-white text-center md:text-left">Calculate Your Price.</h2>
+            <p className="text-neutral-500 dark:text-neutral-400 mb-6 text-center md:text-left">Get an instant estimate and lock in a 20% discount.</p>
+            <CostCalculator />
+          </div>
         </div>
-        <BugIdentifier />
       </section>
 
       {/* 4. SERVICES SNAPSHOT */}

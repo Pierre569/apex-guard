@@ -1,0 +1,15 @@
+{
+    "businessName": "Apex Guard",
+    "niche": "Pest Control",
+    "location": "Wilmington, NC",
+    "phone": "(910) 387-9259",
+    "url": "https://apex-guard.com",
+    "geo": {
+        "lat": 34.2104,
+        "lng": -77.8868
+    },
+    "aiName": "Alex",
+    "meta": {
+        "schemaType": "PestControlService"
+    }
+}
