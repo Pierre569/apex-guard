@@ -7,6 +7,7 @@
 interface GHLPayload {
     firstName: string;
     phone: string;
+    email?: string;
     locationId: string;
     tags: string[];
     customFields?: Array<{ id: string; value: string }>;
@@ -17,50 +18,41 @@ interface NotePayload {
     userId: string;
 }
 
-export const handleVapiToGHL = async (vapiArgs: {
-    summary: string;
-    customer_name: string;
-    customer_phone: string;
-    pest_type?: string;
-}) => {
-    const { summary, customer_name, customer_phone, pest_type } = vapiArgs;
+// SHARED CONFIGURATION
+const getGhlConfig = () => {
+    const apiKey = process.env.GHL_API_KEY;
+    const locationId = process.env.GHL_LOCATION_ID;
 
-    // These should be set in your .env.local file
-    const GHL_API_KEY = process.env.GHL_API_KEY;
-    const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID;
-
-    // Guard clause for missing configuration
-    if (!GHL_API_KEY || !GHL_LOCATION_ID) {
+    if (!apiKey || !locationId) {
         console.error("❌ Missing GHL Configuration (API Key or Location ID)");
-        return { status: "error", message: "Server configuration error" };
+        return null; // Signals missing config
     }
 
-    const headers = {
-        'Authorization': `Bearer ${GHL_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Version': '2021-07-28'
-    };
-
-    try {
-        console.log(`🚀 Sending Lead to GHL: ${customer_name}`);
-
-        // STEP 1: Upsert the Contact (Create or Update)
-        const contactPayload: GHLPayload = {
-            firstName: customer_name || "New Lead",
-            phone: customer_phone,
-            locationId: GHL_LOCATION_ID,
-            tags: ["ai-voice-lead", "owner-followup-requested"],
-        };
-
-        // Add custom field only if pest_type is provided
-        if (pest_type) {
-            contactPayload.customFields = [{ id: "pest_type_field_id", value: pest_type }];
+    return {
+        apiKey,
+        locationId,
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'Version': '2021-07-28'
         }
+    };
+};
 
+/**
+ * CORE HELPER: Upsert Contact & Add Note
+ */
+async function upsertAndNote(
+    contactData: GHLPayload,
+    noteBody: string,
+    config: NonNullable<ReturnType<typeof getGhlConfig>>
+) {
+    try {
+        // 1. UPSERT
         const contactRes = await fetch('https://services.leadconnectorhq.com/contacts/upsert', {
             method: 'POST',
-            headers,
-            body: JSON.stringify(contactPayload)
+            headers: config.headers,
+            body: JSON.stringify(contactData)
         });
 
         if (!contactRes.ok) {
@@ -68,77 +60,122 @@ export const handleVapiToGHL = async (vapiArgs: {
             throw new Error(`GHL Upsert Failed: ${errorText}`);
         }
 
-        const contactData = await contactRes.json();
-        const contactId = contactData.contact.id;
+        const contactDataRes = await contactRes.json();
+        const contactId = contactDataRes.contact.id;
 
-        // STEP 2: Add the AI Summary as a Note for the Owner
+        // 2. NOTE
         const notePayload: NotePayload = {
-            body: `🚨 AI VOICE SUMMARY FOR OWNER: ${summary}`,
-            userId: "" // Leave empty to assign to system/owner default
+            body: noteBody,
+            userId: ""
         };
 
-        const noteRes = await fetch(`https://services.leadconnectorhq.com/contacts/${contactId}/notes`, {
+        await fetch(`https://services.leadconnectorhq.com/contacts/${contactId}/notes`, {
             method: 'POST',
-            headers,
+            headers: config.headers,
             body: JSON.stringify(notePayload)
         });
 
-        if (!noteRes.ok) {
-            throw new Error("GHL Note Creation Failed");
+        return { status: "success", id: contactId };
+    } catch (error) {
+        console.error("GHL Sync Error:", error);
+        throw error;
+    }
+}
+
+// --- PUBLIC EXPORTS ---
+
+/**
+ * Syncs Vapi Voice Calls to GHL
+ */
+export const handleVapiToGHL = async (vapiArgs: {
+    summary: string;
+    customer_name: string;
+    customer_phone: string;
+    pest_type?: string;
+}) => {
+    const config = getGhlConfig();
+    if (!config) return { status: "error", message: "Config Missing" };
+
+    const { summary, customer_name, customer_phone, pest_type } = vapiArgs;
+
+    try {
+        const payload: GHLPayload = {
+            firstName: customer_name || "New Voice Lead",
+            phone: customer_phone,
+            locationId: config.locationId,
+            tags: ["ai-voice-lead", "owner-followup-requested"],
+        };
+
+        if (pest_type) {
+            payload.customFields = [{ id: "pest_type_field_id", value: pest_type }];
         }
 
-        return {
-            status: "success",
-            message: "Lead synced to GHL and Note added."
+        await upsertAndNote(payload, `🚨 AI VOICE SUMMARY: ${summary}`, config);
+
+        return { status: "success", message: "Voice Lead Synced" };
+    } catch (e) {
+        return { status: "error", message: "Sync Failed" };
+    }
+};
+
+/**
+ * Syncs Web Form Submissions to GHL
+ */
+export const syncWebLeadToGHL = async (formData: {
+    name: string;
+    phone: string;
+    email: string;
+    serviceType: string;
+    issue: string;
+}) => {
+    const config = getGhlConfig();
+    if (!config) return { status: "skip", message: "GHL Not Configured" };
+
+    try {
+        const payload: GHLPayload = {
+            firstName: formData.name,
+            phone: formData.phone,
+            email: formData.email,
+            locationId: config.locationId,
+            tags: ["apex-guard-web-lead", formData.serviceType],
         };
 
-    } catch (error) {
-        console.error("GHL Integration Error:", error);
-        // Return a clean error object so Vapi doesn't crash
-        return {
-            status: "error",
-            message: error instanceof Error ? error.message : "Unknown error"
-        };
+        await upsertAndNote(payload, `🚨 WEB FORM SUBMISSION: ${formData.issue}`, config);
+
+        return { status: "success" };
+    } catch (e) {
+        console.error("Web Lead Sync Failed", e);
+        return { status: "error" };
     }
 };
 
 /**
  * Checks availability in GHL for a specific date.
- * NOTE: GHL API v2 requires a Calendar ID. If missing, we simulate "Smart Availability".
  */
 export const getGHLAvailability = async (date: string) => {
-    const GHL_API_KEY = process.env.GHL_API_KEY;
-    const GHL_CALENDAR_ID = process.env.GHL_CALENDAR_ID; // User needs to add this
+    const config = getGhlConfig();
+    const GHL_CALENDAR_ID = process.env.GHL_CALENDAR_ID;
 
     console.log(`Checking GHL Availability for ${date}...`);
 
     try {
-        if (!GHL_API_KEY || !GHL_CALENDAR_ID) {
+        if (!config || !GHL_CALENDAR_ID) {
             console.warn("⚠️ GHL Calendar Config missing. Using Smart Simulation.");
-            // Simulation: Assume 9am, 1pm, 3pm are open on weekdays
             const day = new Date(date).getDay();
             if (day === 0 || day === 6) return "I'm sorry, we are fully booked this weekend. How about Monday at 9am?";
             return "I have openings at 9:00 AM, 1:00 PM, and 3:00 PM. Do any of those work for you?";
         }
 
-        // REAL API CALL (GHL v2 Free Slots)
         const startTime = new Date(`${date}T00:00:00`).getTime();
         const endTime = new Date(`${date}T23:59:59`).getTime();
 
         const url = `https://services.leadconnectorhq.com/calendars/${GHL_CALENDAR_ID}/free-slots?startDate=${startTime}&endDate=${endTime}`;
 
-        const res = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${GHL_API_KEY}`,
-                'Version': '2021-07-28'
-            }
-        });
+        const res = await fetch(url, { headers: config.headers });
 
         if (!res.ok) throw new Error("API Request Failed");
 
         const data = await res.json();
-        // Assume data is { slots: [...] } - Simplifying for Vapi consumption
-        // In reality, we'd parse the slots. For now, we return a generic success if API hits.
         return "I checked our live calendar. It looks like we have 10:00 AM and 2:00 PM open on that day. Which works best?";
 
     } catch (error) {

@@ -22,28 +22,20 @@ export async function POST(req: Request) {
             createdAt: serverTimestamp()
         });
 
-        // 2. Post to GoHighLevel (If configured)
-        const ghlWebhookUrl = process.env.GHL_WEBHOOK_URL;
-        if (ghlWebhookUrl) {
-            try {
-                console.log('🚀 Syncing to GHL...');
-                await fetch(ghlWebhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name,
-                        phone,
-                        email,
-                        tags: ['apex-guard-web-lead', serviceType],
-                        message: issue,
-                        source: 'apex-guard-website'
-                    })
-                });
-                console.log('✅ GHL Sync Success');
-            } catch (ghlError) {
-                console.error('❌ GHL Sync Failed:', ghlError);
-                // We don't fail the request if GHL fails, just log it.
-            }
+        // 2. Post to GoHighLevel (Robust API Sync)
+        try {
+            const { syncWebLeadToGHL } = await import('@/lib/ghl-bridge');
+            console.log('🚀 Syncing Web Lead to GHL...');
+            await syncWebLeadToGHL({
+                name,
+                phone,
+                email,
+                serviceType,
+                issue
+            });
+            console.log('✅ GHL Sync Initiated');
+        } catch (ghlError) {
+            console.error('❌ GHL Sync Failed:', ghlError);
         }
 
         // 3. Trigger Immediate Vapi Call (If requested)
