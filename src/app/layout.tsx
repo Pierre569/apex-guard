@@ -19,14 +19,28 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import TabManager from "@/components/TabManager";
+
 export const metadata: Metadata = {
-  title: "ApexGuard Pest Control | Your Home, Our Fortress",
-  description: "Raleigh's #1 High-Speed, Eco-Safe Pest Control. We're there in 60 minutes.",
-  icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+  title: {
+    default: "Apex Guard | Professional Pest Control",
+    template: "%s | Apex Guard",
   },
+  description: "AI-Powered Pest Protection for your home and family. Call (910) 387-9259 for a free inspection.",
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/logo.png', type: 'image/png' },
+    ],
+    shortcut: ['/logo.png'],
+    apple: [
+      { url: '/logo.png' },
+    ],
+  },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#2563eb' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+  ],
 };
 
 export default function RootLayout({
@@ -78,6 +92,7 @@ export default function RootLayout({
             })
           }}
         />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
@@ -97,6 +112,7 @@ export default function RootLayout({
           <FloatingCall />
           <CookieBanner />
           <SchemaMarkup />
+          <TabManager />
           {/* HighLevel Chat Widget Container */}
           <div id="ghl-chat-container"></div>
         </ThemeProvider>
